@@ -1,0 +1,516 @@
+server.port: 5000
+
+# https://springdoc.org/properties.html
+springdoc:
+  api-docs.enabled: true
+  show-actuator: true
+  swagger-ui:
+    enabled: true
+    disable-swagger-default-url: true
+    path: swagger-ui.html
+    tagsSorter: alpha
+    urls:
+      - name: '*Local Gateway API'
+        url: /v3/api-docs
+      - name: Lotomobil App API
+        url: ${url.service.lotomobil-app}/lotomobil-service-lotomobil-app/v2/api-docs
+      - name: User API
+        url: ${url.service.user}/lotomobil-service-user/v2/api-docs
+      - name: Notification API
+        url: ${url.service.notification}/lotomobil-service-notification/v2/api-docs
+      - name: Auth API
+        url: ${url.service.auth}/lotomobil-service-auth/v2/api-docs
+      - name: Announcement API
+        url: ${url.service.announcement}/lotomobil-service-announcement/v2/api-docs
+      - name: Betting Keno API
+        url: ${url.service.betting-keno}/lotomobil-service-betting-keno/v2/api-docs
+      - name: Betting Roulette API
+        url: ${url.service.betting-roulette}/lotomobil-service-betting-roulette/v2/api-docs
+      - name: Betting Grandou API
+        url: ${url.service.betting-grandou}/lotomobil-service-grandou/v2/api-docs
+      - name: Betting Crash API
+        url: ${url.service.betting-crash}/lotomobil-service-betting-crash/v2/api-docs
+      - name: Betting Slots API
+        url: ${url.service.betting-slots}/lotomobil-service-betting-slots/v2/api-docs
+      - name: Betting LSports API
+        url: ${url.service.betting-lsports}/lotomobil-service-betting-lsports/v2/api-docs
+      - name: Betting Soccer API
+        url: ${url.service.betting-soccer}/lotomobil-service-betting-soccer/v2/api-docs
+      - name: Betting Receipt API
+        url: ${url.service.betting-receipt}/lotomobil-service-betting-receipt/v2/api-docs
+      - name: Lottery Service API
+        url: ${url.service.lottery}/lotomobil-service-lottery/v2/api-docs
+      - name: Lottery Betting API
+        url: ${url.service.betting}/lotomobil-service-betting/v2/api-docs
+      - name: Liquidity Risk API
+        url: ${url.service.liquidity-risk}/lotomobil-service-liquidity-risk/v2/api-docs
+      - name: Payment Account API
+        url: ${url.service.payment-account}/lotomobil-service-payment-account/v2/api-docs
+      - name: Payment Promotion API
+        url: ${url.service.payment-promotion}/lotomobil-service-payment-promotion/v2/api-docs
+      - name: Payment Lotomobil API
+        url: ${url.service.payment-lotomobil}/lotomobil-service-payment-lotomobil/v2/api-docs
+      - name: Payment Moncash API
+        url: ${url.service.payment-moncash}/lotomobil-service-payment-moncash/v2/api-docs
+      - name: Payment Nupeye API
+        url: ${url.service.payment-nupeye}/lotomobil-service-payment-nupeye/v2/api-docs
+      - name: Payment Transferpam API
+        url: ${url.service.payment-transferpam}/lotomobil-service-payment-transferpam/v2/api-docs
+      - name: Payment Natcash API
+        url: ${url.service.payment-natcash}/lotomobil-service-payment-natcash/v2/api-docs
+      - name: Report API
+        url: ${url.service.report}/lotomobil-service-report/v2/api-docs
+      - name: Boobool API
+        url: ${url.service.boobool}/lotomobil-service-boobool/v2/api-docs
+
+spring:
+  cloud.gateway:
+    discovery:
+      # TODO: find out how to exclude ("description": "Discovery Client not initialized") from health-checks
+      enabled: false
+      client.composite-indicator.enabled: false
+      locator.enabled: false
+    filter.remove-hop-by-hop:
+      - Access-Control-Allow-Origin
+      - Access-Control-Allow-Credentials
+    routes:
+      # Lotomobil App Service
+      - id: lotomobil-service-lotomobil-app
+        uri: ${url.service.lotomobil-app}/
+        predicates:
+          - Path=/v1/betting-all/**,/v1/lotomobil-app/configuration,/v1/payment-method-configurations/**,/v2/betting/game-configurations/**
+        filters:
+          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+          - PreserveHostHeader
+      - id: lotomobil-service-lotomobil-app-swagger
+        uri: ${url.service.lotomobil-app}/
+        predicates:
+          - Path=/lotomobil-service-lotomobil-app/**
+        filters:
+          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+          - StripPrefix=1
+          - PreserveHostHeader
+
+      # User Service
+      - id: user-service
+        uri: ${url.service.user}/
+        predicates:
+          - Path=/invitation-code/**,/abstract-users/**,/player/**,/players/**,/sale-agent/**,/sale-agents/**,/remittance-agent/**,/remittance-agents/**,/admin/**,/admins/**,/retailers/**,/wholesalers/**,/paper-sale-owner/**,/paper-sale-owners/**,/paper-sale-regional-manager/**,/paper-sale-regional-managers/**,/my-paper-sale-regional-managers/**,/paper-sale-regular-manager/**,/paper-sale-regular-managers/**,/my-paper-sale-regular-managers/**,/paper-sale-agent/**,/paper-sale-agents/**,/my-paper-sale-agents/**,/paper-sale-business/**,/user/mobile-app/**,/v1/lotomobil-app/**,/cities/**,/feedback/**,/operators/**
+        filters:
+          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+          - PreserveHostHeader
+      - id: user-service-swagger
+        uri: ${url.service.user}/
+        predicates:
+          - Path=/lotomobil-service-user/**
+        filters:
+          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+          - StripPrefix=1
+          - PreserveHostHeader
+
+      # Notification Service
+      - id: notification-service
+        uri: ${url.service.notification}/
+        predicates:
+          - Path=/user/push/**,/user/notification/**,/user/notifications/**,/v3/user/push-config/**
+        filters:
+          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+          - PreserveHostHeader
+      - id: notification-service-swagger
+        uri: ${url.service.notification}/
+        predicates:
+          - Path=/lotomobil-service-notification/**
+        filters:
+          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+          - StripPrefix=1
+          - PreserveHostHeader
+
+      # Auth Service
+      - id: lotomobil-service-auth
+        uri: ${url.service.auth}/
+        predicates:
+          - Path=/user/**,/client/**,/login/**,/otp/**
+        filters:
+          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+          - PreserveHostHeader
+      - id: lotomobil-service-auth-swagger
+        uri: ${url.service.auth}/
+        predicates:
+          - Path=/lotomobil-service-auth/**
+        filters:
+          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+          - StripPrefix=1
+          - PreserveHostHeader
+
+      # Announcement Service
+      - id: lotomobil-service-announcement
+        uri: ${url.service.announcement}/
+        predicates:
+          - Path=/announcements/**,/banners/**,/v2/banners/**
+        filters:
+          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+          - PreserveHostHeader
+      - id: announcement-service-swagger
+        uri: ${url.service.announcement}/
+        predicates:
+          - Path=/lotomobil-service-announcement/**
+        filters:
+          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+          - StripPrefix=1
+          - PreserveHostHeader
+
+      # Betting Keno Service
+      - id: lotomobil-service-betting-keno
+        uri: ${url.service.betting-keno}/
+        predicates:
+          - Path=/v1/betting/keno/**,/v2/betting/keno/**
+        filters:
+          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+          - PreserveHostHeader
+      - id: lotomobil-service-betting-keno-swagger
+        uri: ${url.service.betting-keno}/
+        predicates:
+          - Path=/lotomobil-service-betting-keno/**
+        filters:
+          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+          - StripPrefix=1
+          - PreserveHostHeader
+
+      # Betting Roulette Service
+      - id: lotomobil-service-betting-roulette
+        uri: ${url.service.betting-roulette}/
+        predicates:
+          - Path=/v1/betting/roulette/**,/v1/betting/mini-roulette/**
+        filters:
+          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+          - PreserveHostHeader
+      - id: lotomobil-service-betting-roulette-swagger
+        uri: ${url.service.betting-roulette}/
+        predicates:
+          - Path=/lotomobil-service-betting-roulette/**
+        filters:
+          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+          - StripPrefix=1
+          - PreserveHostHeader
+
+      # Betting Grandou Service
+      - id: lotomobil-service-grandou
+        uri: ${url.service.betting-grandou}/
+        predicates:
+          - Path=/v1/betting/grandou/**
+        filters:
+          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+          - PreserveHostHeader
+      - id: lotomobil-service-grandou-swagger
+        uri: ${url.service.betting-grandou}/
+        predicates:
+          - Path=/lotomobil-service-grandou/**
+        filters:
+          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+          - StripPrefix=1
+          - PreserveHostHeader
+
+      # Betting Crash Service
+      - id: lotomobil-service-betting-crash
+        uri: ${url.service.betting-crash}/
+        predicates:
+          - Path=/v1/betting/crash/**,/crash-ui/**
+        filters:
+          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+          - PreserveHostHeader
+      - id: lotomobil-service-betting-crash-swagger
+        uri: ${url.service.betting-crash}/
+        predicates:
+          - Path=/lotomobil-service-betting-crash/**
+        filters:
+          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+          - StripPrefix=1
+          - PreserveHostHeader
+
+      # Betting Slots Service
+      - id: lotomobil-service-betting-slots
+        uri: ${url.service.betting-slots}/
+        predicates:
+          - Path=/v1/betting/slots/**
+        filters:
+          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+          - PreserveHostHeader
+      - id: lotomobil-service-betting-slots-swagger
+        uri: ${url.service.betting-slots}/
+        predicates:
+          - Path=/lotomobil-service-betting-slots/**
+        filters:
+          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+          - StripPrefix=1
+          - PreserveHostHeader
+
+      # Betting LSports Service
+      - id: lotomobil-service-betting-lsports
+        uri: ${url.service.betting-lsports}/
+        predicates:
+          - Path=/lsports/**
+        filters:
+          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+          - PreserveHostHeader
+      - id: lotomobil-service-betting-lsports-swagger
+        uri: ${url.service.betting-lsports}/
+        predicates:
+          - Path=/lotomobil-service-betting-lsports/**
+        filters:
+          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+          - StripPrefix=1
+          - PreserveHostHeader
+
+      # Betting Soccer Service
+      - id: lotomobil-service-betting-soccer
+        uri: ${url.service.betting-soccer}/
+        predicates:
+          - Path=/v1/betting/football/**,/v1/betting/soccer/**,/v2/betting/soccer/**,/v2/betting/sports/**
+        filters:
+          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+          - PreserveHostHeader
+      - id: lotomobil-service-betting-soccer-swagger
+        uri: ${url.service.betting-soccer}/
+        predicates:
+          - Path=/lotomobil-service-betting-soccer/**
+        filters:
+          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+          - StripPrefix=1
+          - PreserveHostHeader
+
+      # Betting Receipt Service
+      - id: lotomobil-service-betting-receipt
+        uri: ${url.service.betting-receipt}/
+        predicates:
+          - Path=/bet-receipts/**,/bet-receipts-with-numbers/**,/v2/bet-receipts/**,/v3/bet-receipts/**,/v3/admin/bet-receipts/**
+        filters:
+          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+          - PreserveHostHeader
+      - id: lotomobil-service-betting-receipt-swagger
+        uri: ${url.service.betting-receipt}/
+        predicates:
+          - Path=/lotomobil-service-betting-receipt/**
+        filters:
+          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+          - StripPrefix=1
+          - PreserveHostHeader
+
+      # Lottery Service
+      - id: lotomobil-service-lottery
+        uri: ${url.service.lottery}/
+        predicates:
+          - Path=/lottery/**,/lotteries/**
+        filters:
+          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+          - PreserveHostHeader
+      - id: lotomobil-service-lottery-swagger
+        uri: ${url.service.lottery}/
+        predicates:
+          - Path=/lotomobil-service-lottery/**
+        filters:
+          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+          - StripPrefix=1
+          - PreserveHostHeader
+
+      # Lottery Betting Service
+      - id: lotomobil-service-betting
+        uri: ${url.service.betting}/
+        predicates:
+          - Path=/bet/**,/bets/**,/bet-statistics/**,/game/**,/draw/**,/checkout/**,/v2/betting/**,/v3/betting/**,/v4/betting/lotteries/**
+        filters:
+          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+          - PreserveHostHeader
+      - id: lotomobil-service-betting-swagger
+        uri: ${url.service.betting}/
+        predicates:
+          - Path=/lotomobil-service-betting/**
+        filters:
+          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+          - StripPrefix=1
+          - PreserveHostHeader
+
+      # Liquidity Risk Service
+      - id: liquidity-risk-service
+        uri: ${url.service.liquidity-risk}/
+        predicates:
+          - Path=/bet-risk/**,/aggregated-array/**,/aggregated-prize/**,/aggregated-wagers/**,/threshold/**
+        filters:
+          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+          - PreserveHostHeader
+      - id: liquidity-risk-swagger
+        uri: ${url.service.liquidity-risk}/
+        predicates:
+          - Path=/lotomobil-service-liquidity-risk/**
+        filters:
+          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+          - StripPrefix=1
+          - PreserveHostHeader
+
+      # Payment Account Service
+      - id: lotomobil-service-payment-account
+        uri: ${url.service.payment-account}/
+        predicates:
+          - Path=/payment/account/**,/payment/accounts/**,/payment/admin/account/**,/payment/admin/accounts/**,/payment/paper-sale/account/**,/payment/paper-sale/accounts/**,/payment/transaction/**,/payment/transactions/**,/payment/admin/transaction/**,/payment/admin/transactions/**,/payment/paper-sale/transaction/**,/payment/paper-sale/transactions/**,/payment/admin/report/transactions/**,/payment/admin/report/purchase-transactions/**,/payment/admin/report/transfer-transactions/**,/payment/admin/report/withdraw-transactions/**,/payment/admin/report/points-issued-by-lotomobil/**,/payment/admin/report/points-purchased/**,/payment/admin/report/cash-withdrawn/**,/payment/admin/report/point-purchase/total-by-period/**,/payment/admin/report/withdraw/total-by-period/**,/payment/report/points-purchased/**,/payment/report/cash-withdrawn/**,/payment/paper-sale/report/points-purchased/**,/payment/paper-sale/report/cash-withdrawn/**,/payment/report/transactions/**,/payment/currency/**,/payment/payment-methods-configurations/**
+        filters:
+          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+          - PreserveHostHeader
+      - id: lotomobil-service-payment-account-swagger
+        uri: ${url.service.payment-account}/
+        predicates:
+          - Path=/lotomobil-service-payment-account/**
+        filters:
+          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+          - StripPrefix=1
+          - PreserveHostHeader
+
+      # Payment Promotion Service
+      - id: lotomobil-service-payment-promotion
+        uri: ${url.service.payment-promotion}/
+        predicates:
+          - Path=/promotions/**
+        filters:
+          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+          - PreserveHostHeader
+      - id: lotomobil-service-payment-promotion-swagger
+        uri: ${url.service.payment-promotion}/
+        predicates:
+          - Path=/lotomobil-service-payment-promotion/**
+        filters:
+          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+          - StripPrefix=1
+          - PreserveHostHeader
+
+      # Payment Lotomobil Service
+      - id: lotomobil-service-payment-lotomobil
+        uri: ${url.service.payment-lotomobil}/
+        predicates:
+          - Path=/payment/lotomobil/configuration/**,/payment/purchase/**,/payment/*/purchase/total,/payment/remittance-transaction/**,/payment/remittance-transactions/**,/payment/*/remittance-transactions/**,/payment/invoice/**,/payment/invoices/**,/payment/*/invoices/**,/payment/banks/**
+        # can conflict with lotomobil-service-payment-report ?
+        filters:
+          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+          - PreserveHostHeader
+      - id: lotomobil-service-payment-lotomobil-swagger
+        uri: ${url.service.payment-lotomobil}/
+        predicates:
+          - Path=/lotomobil-service-payment-lotomobil/**
+        filters:
+          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+          - StripPrefix=1
+          - PreserveHostHeader
+
+      # Payment Moncash Service
+      - id: lotomobil-service-payment-moncash
+        uri: ${url.service.payment-moncash}/
+        predicates:
+          - Path=/moncash/**
+        filters:
+          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+          - PreserveHostHeader
+      - id: lotomobil-service-payment-moncash-swagger
+        uri: ${url.service.payment-moncash}/
+        predicates:
+          - Path=/lotomobil-service-payment-moncash/**
+        filters:
+          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+          - StripPrefix=1
+          - PreserveHostHeader
+
+      # Payment Nupeye Service
+      - id: lotomobil-service-payment-nupeye
+        uri: ${url.service.payment-nupeye}/
+        predicates:
+          - Path=/nupeye/**
+        filters:
+          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+          - PreserveHostHeader
+      - id: lotomobil-service-payment-nupeye-swagger
+        uri: ${url.service.payment-nupeye}/
+        predicates:
+          - Path=/lotomobil-service-payment-nupeye/**
+        filters:
+          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+          - StripPrefix=1
+          - PreserveHostHeader
+
+      # Payment Transferpam Service
+      - id: lotomobil-service-payment-transferpam
+        uri: ${url.service.payment-transferpam}/
+        predicates:
+          - Path=/transferpam/**
+        filters:
+          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+          - PreserveHostHeader
+      - id: lotomobil-service-payment-transferpam-swagger
+        uri: ${url.service.payment-transferpam}/
+        predicates:
+          - Path=/lotomobil-service-payment-transferpam/**
+        filters:
+          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+          - StripPrefix=1
+          - PreserveHostHeader
+
+      # Payment Natcash Service
+      - id: lotomobil-service-payment-natcash
+        uri: ${url.service.payment-natcash}/
+        predicates:
+          - Path=/natcash/**
+        filters:
+          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+          - PreserveHostHeader
+      - id: lotomobil-service-payment-natcash-swagger
+        uri: ${url.service.payment-natcash}/
+        predicates:
+          - Path=/lotomobil-service-payment-natcash/**
+        filters:
+          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+          - StripPrefix=1
+          - PreserveHostHeader
+
+      # Report Service
+      - id: lotomobil-service-report
+        uri: ${url.service.report}/
+        predicates:
+          - Path=/report/**
+        filters:
+          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+          - PreserveHostHeader
+      - id: lotomobil-service-report-swagger
+        uri: ${url.service.report}/
+        predicates:
+          - Path=/lotomobil-service-report/**
+        filters:
+          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+          - StripPrefix=1
+          - PreserveHostHeader
+
+      # Boobool service
+      - id: lotomobil-service-boobool
+        uri: ${url.service.boobool}/
+        predicates:
+          - Path=/boobool/**
+        filters:
+          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+          - PreserveHostHeader
+      - id: lotomobil-service-boobool-swagger
+        uri: ${url.service.boobool}/
+        predicates:
+          - Path=/lotomobil-service-boobool/**
+        filters:
+          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+          - StripPrefix=1
+          - PreserveHostHeader
+
+management:
+  endpoint:
+    health:
+      show-details: ALWAYS
+      status:
+        order: fatal,down,out-of-service,unknown,up
+        http-mapping:
+          down: 503
+          fatal: 503
+          out-of-service: 503
+    shutdown.enabled: false
+  endpoints.web:
+    cors.allowed-methods: GET,POST,DELETE
+    exposure.include: health,env,beans,loggers,metrics,threaddump,heapdump,shutdown
